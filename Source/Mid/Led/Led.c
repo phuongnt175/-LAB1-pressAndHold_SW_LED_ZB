@@ -5,9 +5,8 @@
  *      Author: admin1
  */
 #include "app/framework/include/af.h"
-#include "led.h"
 #include "em_timer.h"
-
+#include "led.h"
 
 typedef struct {
   GPIO_Port_TypeDef   port;
@@ -17,13 +16,12 @@ typedef struct {
   uint32_t 			  onTime;
   uint32_t			  offTime;
   uint8_t			  blinkTime;
-} ledArray_t;
+}ledArray_t;
 
 EmberEventControl led1ToggleEventControl,led2ToggleEventControl;
 EmberEventControl *ledEventControl[LED_RGB_COUNT];
 
 ledArray_t led_Array[LED_RGB_COUNT][LED_RGB_ELEMENT] = {LED_RGB_1, LED_RGB_2};
-
 ledArray_t ledAction[LED_RGB_COUNT];
 
 
@@ -36,10 +34,8 @@ ledArray_t ledAction[LED_RGB_COUNT];
 void ledInit(void)
 {
 	CMU_ClockEnable(cmuClock_GPIO, true);
-	for(int i = 0;i <LED_RGB_COUNT;i++)
-	{
-		for(int j = 0; j< LED_RGB_ELEMENT;j++)
-		{
+	for(int i = 0;i <LED_RGB_COUNT;i++){
+		for(int j = 0; j< LED_RGB_ELEMENT;j++){
 			GPIO_PinModeSet(led_Array[i][j].port, led_Array[i][j].pin,
 							gpioModePushPull,0);
 		}
@@ -58,8 +54,7 @@ void ledInit(void)
  */
 void turnOffRBGLed(ledNumber index)
 {
-	for(int j=0;j<LED_RGB_ELEMENT;j++)
-	{
+	for(int j=0;j<LED_RGB_ELEMENT;j++){
 		GPIO_PinOutSet(led_Array[index][j].port, led_Array[index][j].pin);
 	}
 }
@@ -72,13 +67,10 @@ void turnOffRBGLed(ledNumber index)
  */
 void turnOnLed(ledNumber index, ledColor_e color)
 {
-	for(int j=0;j<LED_RGB_ELEMENT;j++)
-	{
-		if(((color >> j) & 0x01) == 1)
-		{
+	for(int j=0;j<LED_RGB_ELEMENT;j++){
+		if(((color >> j) & 0x01) == 1){
 			GPIO_PinOutClear(led_Array[index][j].port, led_Array[index][j].pin);
-		}
-		else{
+		}else {
 			GPIO_PinOutSet(led_Array[index][j].port, led_Array[index][j].pin);
 		}
 	}
@@ -183,6 +175,3 @@ void led2ToggleEventHandle(void)
 		break;
 	}
 }
-
-
-

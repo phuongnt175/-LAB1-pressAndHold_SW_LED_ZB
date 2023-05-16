@@ -73,6 +73,16 @@ enum{
 	LED_TOGGLE
 };
 
+typedef struct {
+  GPIO_Port_TypeDef   port;
+  unsigned int        pin;
+  bool 				  ledBlinkMode;
+  ledColor_e		  color;
+  uint32_t 			  onTime;
+  uint32_t			  offTime;
+  uint8_t			  blinkTime;
+}ledArray_t;
+
 /* Function prototypes -----------------------------------------------*/
 void ledInit(void);
 void turnOffRBGLed(ledNumber index);

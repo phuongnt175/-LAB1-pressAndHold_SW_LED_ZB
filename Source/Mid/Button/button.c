@@ -34,8 +34,8 @@ static void 	resetButtonParameter(uint8_t index);
 void buttonInit(BUTTON_holdingEvent_t holdingHandle,BUTTON_pressEvent_t pressHandler)
 {
   GPIOINT_Init();
-
   CMU_ClockEnable(cmuClock_GPIO, true);
+
   uint8_t i;
   for ( i = 0; i < BUTTON_COUNT; i++ ) {
     /* Configure pin as input */
@@ -43,9 +43,11 @@ void buttonInit(BUTTON_holdingEvent_t holdingHandle,BUTTON_pressEvent_t pressHan
                     buttonArray[i].pin,
 					gpioModeInput,
 					GPIO_DOUT);
+
     /* Register callbacks before setting up and enabling pin interrupt. */
     GPIOINT_CallbackRegister(buttonArray[i].pin,
                              halInternalButtonIsr);
+
     /* Set rising and falling edge interrupts */
     GPIO_ExtIntConfig(buttonArray[i].port,
                       buttonArray[i].pin,
@@ -54,7 +56,6 @@ void buttonInit(BUTTON_holdingEvent_t holdingHandle,BUTTON_pressEvent_t pressHan
                       true,
                       true);
   }
-
   holdingCallbackFunc=holdingHandle;
   pressAndHoldingCallbackFunc=pressHandler;
 
@@ -100,9 +101,7 @@ void halInternalButtonIsr(uint8_t pin)
 	  buttonArray[buttonIndex].press = true;
 	  buttonArray[buttonIndex].release = false;
 
-  }
-  else
-  {
+  }else {
 
 	  buttonArray[buttonIndex].release = true;
 	  buttonArray[buttonIndex].press = false;
@@ -121,22 +120,17 @@ void buttonPressAndHoldEventHandle(void)
 {
 	emberEventControlSetInactive(buttonPressAndHoldEventControl);
 	bool holdTrigger =false;
-	for(int i=0; i<BUTTON_COUNT; i++)
-	{
-		if(buttonArray[i].press ==true)
-		{
+	for(int i=0; i<BUTTON_COUNT; i++){
+		if(buttonArray[i].press ==true){
 			holdTrigger = true;
 			buttonArray[i].holdTime++;
-			if(buttonArray[i].holdTime>=5)
-			{
+			if(buttonArray[i].holdTime>=5){
 				buttonArray[i].isHolding=true;
 				buttonArray[i].pressCount=0;
 			}
 
-			if(holdingCallbackFunc != NULL)
-			{
-				if((buttonArray[i].holdTime %5)==0)
-				{
+			if(holdingCallbackFunc != NULL){
+				if((buttonArray[i].holdTime %5)==0){
 					holdingCallbackFunc(i,buttonArray[i].holdTime/5 + press_max);
 				}
 			}
@@ -155,21 +149,15 @@ void buttonPressAndHoldEventHandle(void)
 void buttonReleaseEventHandle(void)
 {
 	emberEventControlSetInactive(buttonReleaseEventControl);
-	for(int i=0; i<BUTTON_COUNT; i++)
-	{
-		if(buttonArray[i].release == true)
-		{
-			if(pressAndHoldingCallbackFunc != NULL)
-			{
-				if(buttonArray[i].isHolding==false)
-				{
+	for(int i=0; i<BUTTON_COUNT; i++){
+		if(buttonArray[i].release == true){
+			if(pressAndHoldingCallbackFunc != NULL){
+				if(buttonArray[i].isHolding==false){
 					pressAndHoldingCallbackFunc(i, buttonArray[i].pressCount >= press_max ? unknown:buttonArray[i].pressCount);
-				}else
-				{
+				}else {
 					holdingCallbackFunc(i, (buttonArray[i].holdTime/5 + press_max) >= hold_max ? unknown :(buttonArray[i].holdTime/5 + press_max));
 				}
 			}
-
 			resetButtonParameter(i);
 		}
 	}
@@ -199,8 +187,7 @@ static void resetButtonParameter(uint8_t index)
  */
 static uint8_t getButtonIndex(uint8_t pin)
 {
-	for(int i=0; i<BUTTON_COUNT; i++)
-	{
+	for(int i=0; i<BUTTON_COUNT; i++){
 		if(buttonArray[i].pin == pin)
 			return i;
 	}
